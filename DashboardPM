@@ -1,0 +1,1076 @@
+import { Version } from '@microsoft/sp-core-library';
+import {
+  IPropertyPaneConfiguration,
+  PropertyPaneTextField
+} from '@microsoft/sp-property-pane';
+import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { each, escape } from '@microsoft/sp-lodash-subset';
+
+import styles from './SecondDashBoardWebPart.module.scss';
+import * as strings from 'SecondDashBoardWebPartStrings';
+
+//import Plotly from 'plotly.js-dist'
+
+//import * as Plotly from 'plotly.js';
+
+import * as Plotly from 'plotly.js-dist';
+import * as XLSX from 'xlsx';
+
+import { spfi } from "@pnp/sp";
+import "@pnp/sp/sites";
+import {SPFI, SPFx } from "@pnp/sp";
+import "@pnp/sp/webs";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
+import "@pnp/sp/batching";
+import { Caching } from "@pnp/queryable";
+import { IItemUpdateResult } from "@pnp/sp/items";
+import "@pnp/sp/webs";
+import "@pnp/sp/files";
+import "@pnp/sp/folders";
+import { IFolder } from "@pnp/sp/folders";
+import "@pnp/sp/files/folder";
+
+export interface ISecondDashBoardWebPartProps {
+  description: string;
+}
+
+export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecondDashBoardWebPartProps> {
+
+  private _isDarkTheme: boolean = false;
+  private _environmentMessage: string = '';
+
+  protected onInit(): Promise<void> {
+    this._environmentMessage = this._getEnvironmentMessage();
+
+    return super.onInit();
+  }
+
+  public render(): void {
+    this.domElement.innerHTML = `
+    <!DOCTYPE html>
+      <head>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Dashboard6</h1>
+        </div>
+        <div>
+          <h2>Integration of Data</h2>
+          <button hidden id="callChart">Summon the Test Run Chart!!!</button>
+          <button hidden id="excelInitialize">Excel Load </button>
+          
+          <button id="M1InvoiceTotal" style="font-weight: bold">M1 Invoice Monthly Total (Deprecated)</button>
+          <button id="byPMM1" style="font-weight: bold">By PM: M1(Deprecated)</button>
+
+          <br><br><br>
+
+          <button id="spreadSheet">PM Spreadsheet Monthly Total</button>
+          <button id="sqlTotalInvoice">SQL Total Invoice Monthly</button>
+
+          
+
+          <br><br><br>
+
+          <button id="sqlPerPMInvoice"> Per PM SQL Invoice Month </button>
+          <button id="byPMSpreadsheet">By PM: Spreadsheet</button>
+          
+          
+        </div>
+        <div id="tester" ></div>
+        
+      </body>
+    </html>
+    `;
+    let callChartbutton = document.getElementById("callChart");
+    callChartbutton.addEventListener("click", (e: Event) => this.revealChart()); //Creates Chart
+
+    let excelInitializebutton = document.getElementById("excelInitialize");
+    excelInitializebutton.addEventListener("click", (e: Event) => this.beginExcel()); //Tests excel parsing library
+
+    let projectSpreadsheetInitializebutton = document.getElementById("spreadSheet");
+    //projectSpreadsheetInitializebutton.addEventListener("click", (e: Event) => this.projectSpreadsheet()); //This will work on PM Spreadsheet and create a chart
+    projectSpreadsheetInitializebutton.addEventListener("click", (e: Event) => this.hubFunc(3));
+
+    let m1InvoiceMonthlyInitializebutton = document.getElementById("M1InvoiceTotal"); //DEPRECATED - NO LONGER USED
+    m1InvoiceMonthlyInitializebutton.addEventListener("click", (e: Event) => this.invoicePM()); //This will create M1 Invoice Monthly Total
+
+    let byPMSpreadsheetInitializebutton = document.getElementById("byPMSpreadsheet");
+    //byPMSpreadsheetInitializebutton.addEventListener("click", (e: Event) => this.byPMSpreadsheet()); //This will create By PM selected month totals
+    byPMSpreadsheetInitializebutton.addEventListener("click", (e: Event) => this.hubFunc(4));
+
+    let byPmM1Initializebutton = document.getElementById("byPMM1");//DEPRECATED - NO LONGER USED
+    byPmM1Initializebutton.addEventListener("click", (e: Event) => this.byPMM1()); //This will create By PM M1s selected month totals
+
+    let sqlPerPMInvoiceButton = document.getElementById("sqlPerPMInvoice");
+    sqlPerPMInvoiceButton.addEventListener("click", (e: Event) => this.hubFunc(1));
+
+    let sqlTotalInvoiceButton  = document.getElementById("sqlTotalInvoice");
+    //sqlTotalInvoiceButton.addEventListener("click", (e: Event) => this.sqlTotalInvoice());
+    sqlTotalInvoiceButton.addEventListener("click", (e: Event) => this.hubFunc(2));
+
+    
+    //let hubFuncButton  = document.getElementById("hubFunc");
+    //hubFuncButton.addEventListener("click", (e: Event) => this.hubFunc());
+    
+    //You can now read excel files, check the import * as XLSX from 'xlsx'
+    
+
+  }
+  async alignThirdArray(selectedFunction, firstLine, secondLine) //This creates a second line that is aligned properly
+  {
+    if(selectedFunction === 1) //Bar chart: M1 Per PM, Scatter: Spreadsheet Per PM
+    {
+      // X Axis = firstLine.allPersonsArray
+      // Y Axis = firstline.allTotalsArray
+      // Scatter X Axis = secondLine.nameArray
+      // Scatter Y Axis = secondLine.selectedTotals
+      var thirdTotals = new Array();
+      console.log(firstLine.allPersonsArray);
+      console.log(secondLine.nameArray)
+      firstLine.allPersonsArray.forEach((element, index) => 
+      {
+        switch(element)
+        {
+          case "None":
+            console.log("None")
+            thirdTotals.push(0);
+            break;
+
+          case "BRIAMURP":
+            secondLine.nameArray.forEach((element2, index2) => 
+            {
+              if(element2 == "Brian")
+              {
+                console.log("BRIAMURP")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+                
+              }
+            });
+            break;
+          
+          case "CHRIBICK":
+            secondLine.nameArray.forEach((element2, index2) => 
+            {
+              if(element2 == "Christian")
+              {
+                console.log("CHRIBICK")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+                
+              }
+            });
+            break;
+
+          case "HOLLMCMU":
+            console.log("HOLLYMCU");
+            thirdTotals.push(0)
+            break;
+          case "JOHNCOLL":
+            secondLine.nameArray.forEach((element2, index2) => 
+            {
+              if(element2 == "John")
+              {
+                console.log("JOHNCOLL")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+              }
+            });
+            break;
+
+        case "MICHNEWB":
+          secondLine.nameArray.forEach((element2, index2) => 
+          {
+            if(element2 == "Mick")
+            {
+              console.log("MICHNEWB")
+              thirdTotals.push(secondLine.selectedTotals[index2]);
+              
+            }
+          });
+          break;
+
+        case "ROBCUNN":
+          secondLine.nameArray.forEach((element2, index2) => 
+          {
+            if(element2 == "Rob")
+            {
+              console.log("Rob")
+              thirdTotals.push(secondLine.selectedTotals[index2]);
+              
+            }
+          });
+          break;
+
+        case "SAMCHU":
+          secondLine.nameArray.forEach((element2, index2) => 
+          {
+            if(element2 == "Sam")
+            {
+              console.log("Sam")
+              thirdTotals.push(secondLine.selectedTotals[index2]);
+              
+            }
+          });
+          break;
+
+          default:
+            thirdTotals.push(0);
+            
+        }
+        
+      });
+      return thirdTotals;
+
+    }
+    else if(selectedFunction === 4) //Bar chart: Spreadsheet Per PM, Scatter: M1 Per PM
+    {
+      var thirdTotals = new Array();
+      console.log(secondLine.allPersonsArray);
+      console.log(firstLine.nameArray)
+      firstLine.nameArray.forEach((element, index) => 
+      {
+        switch(element)
+        {
+          case "None":
+            console.log("None")
+            thirdTotals.push(0);
+            break;
+
+          case "Brian":
+            var checker = 0;
+            secondLine.allPersonsArray.forEach((element2, index2) => 
+            {
+              if(element2 == "BRIAMURP")
+              {
+                console.log("BRIAMURP")
+                thirdTotals.push(secondLine.allTotalsArray[index2]);
+                checker = 1;
+              }
+            });
+            if(checker == 0)
+            {
+              thirdTotals.push(0);
+            }
+            break;
+          
+          case "Christian":
+            var checker = 0;
+            secondLine.allPersonsArray.forEach((element2, index2) => 
+            {
+              if(element2 == "CHRIBICK")
+              {
+                console.log("CHRIBICK")
+                thirdTotals.push(secondLine.allTotalsArray[index2]);
+                checker = 1;
+              }
+            });
+            if(checker == 0)
+            {
+              thirdTotals.push(0);
+            }
+            break;
+
+          case "HOLLMCMU":
+            console.log("HOLLYMCU");
+            thirdTotals.push(0)
+            break;
+          case "John":
+            var checker = 0;
+            secondLine.allPersonsArray.forEach((element2, index2) => 
+            {
+              if(element2 == "JOHNCOLL")
+              {
+                console.log("JOHNCOLL")
+                thirdTotals.push(secondLine.allTotalsArray[index2]);
+                checker = 1;
+              }
+            });
+            if(checker == 0)
+            {
+              thirdTotals.push(0);
+            }
+            break;
+
+        case "Mick":
+          var checker = 0;
+          secondLine.allPersonsArray.forEach((element2, index2) => 
+          {
+            if(element2 == "MICHNEWB")
+            {
+              console.log("MICHNEWB")
+              thirdTotals.push(secondLine.allTotalsArray[index2]);
+              checker = 1;
+              
+            }
+          });
+          if(checker == 0)
+          {
+            thirdTotals.push(0);
+          }
+          break;
+
+        case "Rob":
+          var checker = 0;
+          secondLine.allPersonsArray.forEach((element2, index2) => 
+          {
+            if(element2 == "ROBCUNN")
+            {
+              console.log("ROBCUNN")
+              thirdTotals.push(secondLine.allTotalsArray[index2]);
+              checker = 1;
+              
+            }
+          });
+          if(checker == 0)
+          {
+            thirdTotals.push(0);
+          }
+          break;
+
+        case "Sam":
+          var checker = 0;
+          secondLine.allPersonsArray.forEach((element2, index2) => 
+          {
+            if(element2 == "SAMCHU")
+            {
+              console.log("Sam")
+              thirdTotals.push(secondLine.allTotalsArray[index2]);
+              checker = 1;
+              
+            }
+          });
+          if(checker == 0)
+          {
+            thirdTotals.push(0);
+          }
+          break;
+
+          default:
+            thirdTotals.push(0);
+            
+        }
+        
+      });
+      //console.log(thirdTotals)
+      return thirdTotals;
+
+
+    }
+  }
+
+  async hubFunc(selectedFunction) //Centralized processing so I do not replicate functions constantly
+  {
+    console.log("This is basically to act as a TRIPWIRE UPLOAD 124")
+    var chartHolder
+    var secondLine;
+    var aligned;
+    if(selectedFunction === 1) //This activates Per SalesPerson Figures of selected Month
+    {
+      chartHolder = await this.sqlPerPerson()
+      secondLine = await this.byPMSpreadsheet()
+      //Need to match secondline with chartHolder
+      aligned = await this.alignThirdArray(selectedFunction, chartHolder, secondLine);
+      this.monthlyChart((await chartHolder).allPersonsArray, (await chartHolder).allTotalsArray, aligned, (await chartHolder).chartName, secondLine.barName)
+    }
+    else if(selectedFunction === 2) //This gets the totals of every month
+    {
+      chartHolder = await this.sqlTotalInvoice()
+      secondLine = await this.projectSpreadsheet()
+      this.monthlyChart((await chartHolder).allDatesArray, (await chartHolder).allTotalsArray, secondLine.totalArray, (await chartHolder).chartName, secondLine.barName)
+    }
+    else if(selectedFunction === 3) //This holds the PM Spreadsheet Monthly Total
+    {
+      chartHolder = await this.projectSpreadsheet()
+      secondLine = await this.sqlTotalInvoice()
+      this.monthlyChart(chartHolder.monthArray, chartHolder.totalArray, secondLine.allTotalsArray, chartHolder.barName, secondLine.chartName)
+    }
+    else if(selectedFunction === 4)
+    {
+      chartHolder = await this.byPMSpreadsheet()
+      secondLine = await this.sqlPerPerson();
+      //Need to match secondline with chartHolder
+      aligned = await this.alignThirdArray(selectedFunction, chartHolder, secondLine)
+      this.monthlyChart(chartHolder.nameArray, chartHolder.selectedTotals, aligned, chartHolder.barName, secondLine.chartName)
+    }
+    //console.log(chartHolder.allDatesArray)
+    
+    //this.monthlyChart(getSQLTotal.allDatesArray, getSQLTotal.allTotalsArray)
+    //this.monthlyChart((await chartHolder).allPersonsArray, (await chartHolder).allTotalsArray, null, (await chartHolder).chartName)
+  }
+
+  async sqlTotalInvoice() //Creates Monthly Total Invoice Array from SQL
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/sqlFolder/sqlInvoiceTotal.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer, {sheetStubs:true});
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames];
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    var maxRowNumber = range.e.r; //Remember this is max number minus 1 (58-1=57 rows)
+
+    var allTotalsArray = new Array();
+    var allDatesArray = new Array();
+    
+    for(var y = 1; y < 13; y++)
+    {
+      var properNumber;
+      if(y.toString().length === 1)
+      {
+        properNumber = "0" + y;
+      }
+      else
+      {
+        properNumber = y.toString();
+      }
+      for(var x = 1; x < maxRowNumber + 2; x++)
+      {
+        
+        if(sheetObject["B" + x].w.includes("2022"))
+        {
+          
+            
+            console.log(properNumber)
+            
+            if(sheetObject["B" + x].w.includes("2022-" + properNumber))
+            {
+              console.log("It has passed")
+              allTotalsArray.push(sheetObject["A" + x].v);
+              allDatesArray.push(new Date(sheetObject["B" + x].w).toLocaleDateString('default', { month: 'long' }));
+              break;
+            }
+        }
+      }
+    }
+    
+    
+
+
+    console.log(allDatesArray);
+    console.log(allTotalsArray)
+    var chartName = "Invoices Per Month"
+    return {allDatesArray, allTotalsArray, chartName}
+    //this.monthlyChart(allDatesArray, allTotalsArray, null, "SQL Invoice Monthly")
+  }
+
+  async sqlPerPerson() //Creates Per Person Invoiced on M1 of a month
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/sqlFolder/sqlMonthlyPM.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer, {sheetStubs:true});
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames];
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    var maxRowNumber = range.e.r;
+    //console.log(maxRowNumber);
+    //console.log(range);
+    //console.log(sheetObject)
+
+    var allTotalsArray = new Array();
+    var allPersonsArray = new Array();
+    var allDatesArray = new Array();
+
+    var selectedMonth = "07"
+
+    for(let x = 1; x < maxRowNumber + 2; x++)
+    {
+      if(sheetObject["C" + x].w.includes("2022-" + selectedMonth))
+      {
+
+          allTotalsArray.push(sheetObject["A" + x].v);
+          allPersonsArray.push(sheetObject["B" + x].v);
+          allDatesArray.push(sheetObject["C" + x].w);
+        
+      }
+    }
+
+    var date = new Date();
+    date.setMonth(parseInt(selectedMonth)-1);
+    var dateName = date.toLocaleString('en-US', {
+      month: 'long',
+    });
+
+
+
+    var chartName = `Per PM Invoiced Selected Month - ${dateName}`
+    return {allPersonsArray, allTotalsArray, chartName}
+    //this.monthlyChart(allPersonsArray, allTotalsArray,)
+
+  }
+
+
+
+  async byPMM1() //DEPRECATED - do not use
+  {
+    const sp = spfi().using(SPFx(this.context));
+
+    //-------------------------------------------M1 Data-------------------------------------------------
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/MonthlyPMM1.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer);
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames];
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    var maxRowNumber = range.e.r;
+    //----------------------------------------------------------------------------------------------------
+
+    //-------------------------------------------PM Spreadsheet Data--------------------------------------
+    var getBufferSpreadsheet = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    var workbookSpreadSheet = XLSX.read(getBufferSpreadsheet);
+
+    var sheetNamesSpreadsheet = workbookSpreadSheet.SheetNames;
+    var nameArray = new Array();
+    sheetNamesSpreadsheet.forEach(element => 
+    {
+      switch(element)
+      {
+        case "John":
+          nameArray.push(element);
+          break;
+        case "Sam":
+          nameArray.push(element);
+          break;
+        case "Christian":
+          nameArray.push(element);
+          break;
+        case "Rob":
+          nameArray.push(element);
+          break;
+        case "Brian":
+          nameArray.push(element);
+          break;
+        case "Shaun":
+          nameArray.push(element);
+          break;
+        case "Mick":
+          nameArray.push(element);
+          break;
+      }
+      
+    });
+
+
+    var sheetObjectArray = new Array();
+    nameArray.forEach(element => 
+    {
+      sheetObjectArray.push(workbookSpreadSheet.Sheets[element])
+      
+    });
+
+    var monthArray = new Array();
+    var totalArray = new Array();
+
+    var multiArray = new Array();
+
+    sheetObjectArray.forEach((element, index) => 
+    {
+      //console.log(element);
+      for(let x = 3; x < 15;x++ )
+      {
+        //multiArray.push([nameArray[index],element["E" + x].v, element["M" + x].v])
+
+        if(monthArray.length !== 12)
+        {
+          monthArray.push(element["E" + x].v)
+        }
+        totalArray.push(element["M" + x].v)
+      }
+      
+    });
+
+    var selectedMonth = 6 //Minus 1 for actual month, so for july, 7-1 = 6
+    var selectedTotals = new Array();
+    for(let x = 0; x < nameArray.length; x++)
+    {
+      selectedTotals.push(totalArray[12 * x + selectedMonth]);
+    }
+    console.log(selectedTotals);
+
+    
+
+
+
+
+
+
+
+
+
+    //-----------------------------------------------------------------------------------------------------
+
+
+
+    var allTotalsArray = new Array();
+    var allPersonsArray = new Array();
+    var allDatesArray = new Array();
+
+    for(let x = 2; x < maxRowNumber + 2; x++)
+    {
+      allTotalsArray.push(sheetObject["A" + x].v);
+      allPersonsArray.push(sheetObject["B" + x].v);
+      allDatesArray.push(sheetObject["C" + x].w);
+    }
+    //console.log(allTotalsArray);
+    //console.log(allPersonsArray);
+    //console.log(allDatesArray);
+
+    var selectedTotalsArray = new Array();
+    var selectedPersonsArray = new Array();
+    var selectedDatesArray = new Array();
+
+    for(let x = 0; x < maxRowNumber + 2; x++)
+    {
+      if(allDatesArray[x] === '7/1/22')
+      {
+        selectedTotalsArray.push(allTotalsArray[x])
+        selectedPersonsArray.push(allPersonsArray[x])
+        selectedDatesArray.push(allDatesArray[x])
+      }
+    }
+
+    //---------------------------------------Get Position of M1 Names when matched by Spreadsheet
+    var indexArray = new Array();
+    var matchingTotalArray = new Array();
+    console.log(matchingTotalArray);
+    selectedPersonsArray.forEach((element, index) => 
+    {
+      console.log(index)
+      switch(element)
+      {
+        case "JOHNCOLL":
+          console.log(index)
+          console.log(selectedTotals[0])
+          indexArray.push(0);
+          matchingTotalArray.push(selectedTotals[0])
+          break;
+
+        case "SAMCHUN":
+          indexArray.push(1);
+          matchingTotalArray.push(selectedTotals[1])
+          break;
+
+        case "CHRIBICK":
+          indexArray.push(2);
+          matchingTotalArray.push(selectedTotals[2])
+          break;
+
+        case "ROBCUNN":
+          indexArray.push(3);
+          matchingTotalArray.push(selectedTotals[3])
+          break;
+
+        case "BRIAMURP":
+          indexArray.push(4);
+          matchingTotalArray.push(selectedTotals[4])
+          break;
+
+        case "SHAUCLOU":
+          indexArray.push(5);
+          matchingTotalArray.push(selectedTotals[5])
+          break;
+
+        case "MICHNEWB":
+          indexArray.push(6);
+          matchingTotalArray.push(selectedTotals[6])
+          break;
+
+        case "None":
+          indexArray.push(7);
+          matchingTotalArray.push(selectedTotals[7])
+          break;
+
+        default:
+          indexArray.push(7);
+          matchingTotalArray.push(selectedTotals[8])
+      }
+      
+    });
+    console.log(indexArray);
+    console.log(matchingTotalArray);
+
+    selectedTotals.forEach(element => {
+
+      
+    });
+    
+
+    for(var x = 0; x < nameArray.length; x++)
+    {
+      console.log(x + " " + indexArray[x]);
+      for(var y = 0; y < nameArray.length; y++)
+      {
+        
+        if(x == indexArray[x])
+        {
+          console.log(x + " " + indexArray[x]);
+        }
+      }
+    }
+
+
+    console.log(selectedTotalsArray);
+    console.log(selectedPersonsArray);
+    console.log(selectedDatesArray);
+
+    this.monthlyChart(selectedPersonsArray, selectedTotalsArray, matchingTotalArray, "M1 PM July Invoice Total")
+
+  }
+
+  async byPMSpreadsheet() //Gets data from PM Spreadsheet and creates Total by Person
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer);
+
+    var sheetNames = workbook.SheetNames;
+    var nameArray = new Array();
+    sheetNames.forEach(element => 
+    {
+      switch(element)
+      {
+        case "John":
+          nameArray.push(element);
+          break;
+        case "Sam":
+          nameArray.push(element);
+          break;
+        case "Christian":
+          nameArray.push(element);
+          break;
+        case "Rob":
+          nameArray.push(element);
+          break;
+        case "Brian":
+          nameArray.push(element);
+          break;
+        case "Shaun":
+          nameArray.push(element);
+          break;
+        case "Mick":
+          nameArray.push(element);
+          break;
+      }
+      
+    });
+    //console.log(nameArray);
+
+    var sheetObjectArray = new Array();
+    nameArray.forEach(element => 
+    {
+      sheetObjectArray.push(workbook.Sheets[element])
+      
+    });
+    
+    var monthArray = new Array();
+    var totalArray = new Array();
+
+    var multiArray = new Array();
+
+    sheetObjectArray.forEach((element, index) => 
+    {
+      //console.log(element);
+      for(let x = 3; x < 15;x++ )
+      {
+        //multiArray.push([nameArray[index],element["E" + x].v, element["M" + x].v])
+
+        if(monthArray.length !== 12)
+        {
+          monthArray.push(element["E" + x].v)
+        }
+        totalArray.push(element["M" + x].v)
+      }
+      
+    });
+
+    var selectedMonth = 6 //Minus 1 for actual month, so for july, 7-1 = 6
+    var selectedTotals = new Array();
+    for(let x = 0; x < nameArray.length; x++)
+    {
+      selectedTotals.push(totalArray[12 * x + selectedMonth]);
+    }
+
+    //console.log(monthArray); //This is simply useless for now, just holds the months
+    //console.log(totalArray); //This is basically repository of all totals
+    //console.log(nameArray); //This one holds the X values (PM Names)
+    //console.log(selectedTotals) // This one holds the selected month total values
+
+    var date = new Date();
+    date.setMonth(selectedMonth);
+    var dateName = date.toLocaleString('en-US', {
+      month: 'long',
+    });
+    //console.log(`Project Managers SpreadSheet Month: ${dateName}`);
+    var barName = `Project Managers SpreadSheet Month: ${dateName}`
+
+    //this.monthlyChart(nameArray, selectedTotals, null, `Project Managers SpreadSheet Month: ${dateName}`, "M1 Invoice Chosen Month")
+    return {nameArray, selectedTotals, barName}
+  }
+
+
+
+  async invoicePM() //This will generate a chart based on M1 Invoice Monthly Total of 2022
+  {
+    //This will be bar chart, not line creation
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/InvoiceTotalMonthly.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer);
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames]
+    
+    //This will be lines on the bar chart
+    var getBufferSpreadsheet = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    var workbookSpreadsheet = XLSX.read(getBufferSpreadsheet);
+    var sheetNamesSpreadsheet = workbookSpreadsheet.SheetNames[0];
+    var sheetObjectSpreadsheet = workbookSpreadsheet.Sheets[sheetNamesSpreadsheet]
+    var monthArraySpreadsheet = new Array();
+    var totalArraySpreadsheet = new Array();
+
+
+    
+    var monthArray = new Array();
+    var totalArray = new Array();
+
+    for( let x = 0; x < 12; x++)
+    {
+      let date = new Date(sheetObject["B" + (x+2)].w);
+      monthArray.push(date.toLocaleDateString('default', {month: 'long'}));
+      //monthArray.push(new Date(sheetObject["B" + (x+2)].w).toLocaleDateString('default', {month: 'long'})); //Converts date to proper date then name of month
+      totalArray.push(sheetObject["A" + (x+2)].v)
+
+      monthArraySpreadsheet.push(sheetObjectSpreadsheet["A" + (x+7)].v);
+      totalArraySpreadsheet.push(sheetObjectSpreadsheet["K" + (x+7)].v);
+    }
+    
+
+    var lineName = "PM Excel Spreadsheet Monthly";
+    var barName = "M1 Invoice Total Monthly";
+
+    this.monthlyChart(monthArray, totalArray, totalArraySpreadsheet, barName, lineName);
+  }
+
+  async projectSpreadsheet() //CREATES MONTHLY TOTAL FROM THE PM SPREADSHEET
+  {
+    //Will first get the monthly totals chart to begin with
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer);
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames]
+    
+
+
+    //This is the scatter one
+    var getBufferSpreadsheet = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/InvoiceTotalMonthly.xlsx").getBuffer();
+    var workbookSpreadsheet = XLSX.read(getBufferSpreadsheet);
+    var sheetNamesSpreadsheet = workbookSpreadsheet.SheetNames[0];
+    var sheetObjectSpreadsheet = workbookSpreadsheet.Sheets[sheetNamesSpreadsheet]
+    var monthArraySpreadsheet = new Array();
+    var totalArraySpreadsheet = new Array();
+
+
+
+    
+    var col = XLSX.utils.decode_col("A");
+    var row = XLSX.utils.decode_row("7");
+    
+    var monthArray = new Array();
+    var totalArray = new Array();
+
+    for(var x  = row; x < 18; x++)
+    {
+      monthArray.push(sheetObject["A" + XLSX.utils.encode_row(x)].v);
+      totalArray.push(sheetObject["K" + XLSX.utils.encode_row(x)].v);
+
+
+      let date = new Date(sheetObjectSpreadsheet["B" + (x-4)].w);
+      monthArraySpreadsheet.push(date.toLocaleDateString('default', {month: 'long'}));// Holds Invoice Monthly months
+      totalArraySpreadsheet.push(sheetObjectSpreadsheet["A" + (x-4)].v); //Holds Invoice Monthly Total
+    }
+
+    //console.log(monthArray);
+    //console.log(totalArray); 
+    var barName = "PM Excel Spreadsheet Monthly";
+    var lineName = "M1 Invoice Total Monthly";
+
+
+
+    //this.monthlyChart(monthArray, totalArray, totalArraySpreadsheet, barName, lineName)
+    return {monthArray, totalArray, barName}
+  }
+
+  monthlyChart(monthArray, totalArray, thirdArray = null, barName = null, lineName = null) //Creates a chart if given Coords
+  {
+    //console.log(thirdArray);
+    //console.log(monthArray);
+    var newTotalArray = new Array();
+
+    totalArray.forEach(element => {
+      newTotalArray.push(element.toLocaleString());
+    });
+
+    //console.log(newTotalArray);
+    var TESTER = document.getElementById('tester');
+    var data = [{ x: monthArray, y: totalArray, text: newTotalArray, type: 'bar'}]
+    var layout = {
+      title: "Project Manager Monthly Total",
+      width: 1000,
+      height: 1000
+      
+    };
+    
+
+
+    var trace1 = {
+      x: monthArray,
+      y: thirdArray,
+      name: lineName,
+      type: 'scatter'
+    };
+    
+    var trace2 = {
+      x: monthArray,
+      y: totalArray,
+      text: newTotalArray,
+      name: barName,
+      type: 'bar'
+    };
+    
+    var data2 = [trace1, trace2];
+
+    Plotly.newPlot( TESTER, data2, { margin: { t: 0 } }, layout ); //data2 not working at the moment, will find out later
+  }
+
+  async beginExcel()// NO LONGER USED
+  {
+    console.log("begin the excel import, it has");
+    const sp = spfi().using(SPFx(this.context));
+
+    const files = await sp.web.getFolderByServerRelativePath("Shared Documents/excelTest").files();
+
+
+    //---------------------This gets all the text within the excel file
+    const file = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/importExcel.xlsx").getBuffer().then((buffer: ArrayBuffer) => {  
+      var workbook = XLSX.read(buffer, {  
+          type: "buffer"  
+      });  
+      var first_sheet_name = workbook.SheetNames[0];  //This holds the sheetname of the first sheet
+      var worksheet = workbook.Sheets[first_sheet_name];  
+      var headers = {};  
+      var data = [];  
+      let z: any;  
+
+      //How this below works, basically data holds column A, row 1 and then it says whats below it, then the next column and again, 
+      //e.g. A1value: A2value, B1value: B2value, A1value: A3value, B1value: B3value
+      for (z in worksheet) {  
+          if (z[0] === '!') continue;  
+          var tt = 0;  
+          for (var i = 0; i < z.length; i++) {  
+              if (!isNaN(z[i])) {  
+                  tt = i;  
+                  break;  
+              }  
+          }  
+          var col = z.substring(0, tt);  
+          var row = parseInt(z.substring(tt));  
+          var value = worksheet[z].v;  
+          //store header names  
+          if (row == 1 && value) {  
+              headers[col] = value;  
+              continue;  
+          }  
+          if (!data[row]) data[row] = {};  
+          data[row][headers[col]] = value;  
+      }  
+      //console.log(data)
+      //console.log(data[3])
+      });
+
+    //-----------------------Closing Above--------------------------------------------------------- 
+    //console.log(file);
+
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/importExcel.xlsx").getBuffer();
+    //console.log(getBuffer);
+
+    var workbook = XLSX.read(getBuffer);
+    
+    var nameSheet = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[nameSheet];
+    //console.log(sheetObject);
+    //console.log(sheetObject["A1"].v); //v gets the raw value of the cell A1
+
+    var refTest = sheetObject['!ref']
+    //console.log(refTest + " is the excel range used!");
+
+    //console.log(sheetObject["A1"]);
+
+    var html = XLSX.utils.sheet_to_json(workbook.Sheets);
+    //console.log(html);
+
+    var x;
+    for (x in sheetObject) //basically goes through every cell that's used, not sure about gaps
+    {
+      //console.log(x);
+      //console.log(sheetObject[x].v);
+    }
+  }
+
+
+  async revealChart() //NO LONGER USED
+  {
+    var TESTER = document.getElementById('tester');
+    Plotly.newPlot( TESTER, [{
+      x: [1, 2, 3, 4, 5],
+      y: [1, 2, 4, 8, 16] }], {
+      margin: { t: 0 } } );
+  }
+
+
+
+
+  private _getEnvironmentMessage(): string {
+    if (!!this.context.sdks.microsoftTeams) { // running in Teams
+      return this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentTeams : strings.AppTeamsTabEnvironment;
+    }
+
+    return this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentSharePoint : strings.AppSharePointEnvironment;
+  }
+
+  protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
+    if (!currentTheme) {
+      return;
+    }
+
+    this._isDarkTheme = !!currentTheme.isInverted;
+    const {
+      semanticColors
+    } = currentTheme;
+    this.domElement.style.setProperty('--bodyText', semanticColors.bodyText);
+    this.domElement.style.setProperty('--link', semanticColors.link);
+    this.domElement.style.setProperty('--linkHovered', semanticColors.linkHovered);
+
+  }
+
+  protected get dataVersion(): Version {
+    return Version.parse('1.0');
+  }
+
+  protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
+    return {
+      pages: [
+        {
+          header: {
+            description: strings.PropertyPaneDescription
+          },
+          groups: [
+            {
+              groupName: strings.BasicGroupName,
+              groupFields: [
+                PropertyPaneTextField('description', {
+                  label: strings.DescriptionFieldLabel
+                })
+              ]
+            }
+          ]
+        }
+      ]
+    };
+  }
+}
