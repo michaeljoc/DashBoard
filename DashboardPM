@@ -31,6 +31,7 @@ import "@pnp/sp/files";
 import "@pnp/sp/folders";
 import { IFolder } from "@pnp/sp/folders";
 import "@pnp/sp/files/folder";
+import { arrangeArray } from "./arrayOrder";
 
 export interface ISecondDashBoardWebPartProps {
   description: string;
@@ -54,31 +55,90 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
       </head>
       <body>
         <div class="header">
-          <h1>Dashboard6</h1>
+          <h1>Dashboard</h1>
         </div>
         <div>
           <h2>Integration of Data</h2>
           <button hidden id="callChart">Summon the Test Run Chart!!!</button>
           <button hidden id="excelInitialize">Excel Load </button>
           
-          <button id="M1InvoiceTotal" style="font-weight: bold">M1 Invoice Monthly Total (Deprecated)</button>
-          <button id="byPMM1" style="font-weight: bold">By PM: M1(Deprecated)</button>
+          <button hidden id="M1InvoiceTotal" style="font-weight: bold">M1 Invoice Monthly Total (Deprecated)</button>
+          <button hidden id="byPMM1" style="font-weight: bold">By PM: M1(Deprecated)</button>
 
           <br><br><br>
 
           <button id="spreadSheet">PM Spreadsheet Monthly Total</button>
-          <button id="sqlTotalInvoice">SQL Total Invoice Monthly</button>
+          <button hidden id="sqlTotalInvoice">SQL Total Invoice Monthly</button>
 
           
 
           <br><br><br>
 
-          <button id="sqlPerPMInvoice"> Per PM SQL Invoice Month </button>
+          <button hidden id="sqlPerPMInvoice"> Per PM SQL Invoice Month </button>
           <button id="byPMSpreadsheet">By PM: Spreadsheet</button>
+
+          <br><br>
+
+          <button id="john">John Monthly</button>
+          <button id="sam">Sam Monthly</button>
+          <button id="christian">Christian Monthly</button>
+          <button id="rob">Rob Monthly</button>
+          <button id="brian">Brian Monthly</button>
+          <button id="shaun">Shaun Monthly</button>
+          <button id="mick">Mick Monthly</button>
+
+          <button id="adam">Adam Monthly</button>
+          <button id="holly">Holly Monthly</button>
+
+
+          <br><br><br>
+
+          <button hidden id="overruns">Overruns</button>
+          <button hidden id="overrunsEfficiency">Overruns Efficiency </button>
+          <button id="overrunsEstimatedvsActual">Estimated vs Actual </button>
+
+          <br><br><br>
+
+          <button id="productionSite">Current Month: Production Sites</button>
+
+          <br><br><br>
+
+          <button id="annualLeaves">Weekly Annual Leave</button>
+          <button id="annualLeavesWithoutLoading">Weekly Annual Without Loading Leave</button>
+          <button id="bereavementLeaves">Weekly Bereavement Leave</button>
+          <button id="tafeLeaves">Weekly TAFE Leave</button>
+          <button id="flexiLeaves">Weekly Flexitime Leave</button>
+          <button id="lwopLeaves">Weekly Leave Without Pay Leave</button>
+          <button hidden id="pubhLeaves">Weekly Public Holiday Leave</button>
+          <button hidden id="rosteredLeaves">Weekly Rostered Day Off Leave</button>
+          <button id="sickLeaves">Weekly Sick Leave</button>
+          <button id="workcoverLeaves">Weekly Work Cover Leave</button>
+          <button id="combinedLeaves">Weekly SL + BEREAV + LWOP</button>
+
+          
+
+          
+
+          
           
           
         </div>
         <div id="tester" ></div>
+
+        <div hidden>
+          <button id="laser">LASER Estimate vs Actual <strong>(under construction)<strong></button>
+          <br><br>
+          <button id="ssban">SSBANDSAW Estimate vs Actual <strong>(under construction)<strong></button>
+          <button id="msban">MSBANDSAW Estimate vs Actual <strong>(under construction)<strong></button>
+          <br><br>
+          <button id="ssfab">SSFABRICATION Estimate vs Actual <strong>(under construction)<strong></button>
+          <button id="msfab">MSFABRICATION Estimate vs Actual <strong>(under construction)<strong></button>
+          <br><br>
+          <button id="press">PRESS Estimate vs Actual <strong>(under construction)<strong></button>
+          <br><br>
+          <button id="finish">FINISHING Estimate vs Actual <strong>(under construction)<strong></button>
+
+        </div>
         
       </body>
     </html>
@@ -96,9 +156,42 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     let m1InvoiceMonthlyInitializebutton = document.getElementById("M1InvoiceTotal"); //DEPRECATED - NO LONGER USED
     m1InvoiceMonthlyInitializebutton.addEventListener("click", (e: Event) => this.invoicePM()); //This will create M1 Invoice Monthly Total
 
-    let byPMSpreadsheetInitializebutton = document.getElementById("byPMSpreadsheet");
-    //byPMSpreadsheetInitializebutton.addEventListener("click", (e: Event) => this.byPMSpreadsheet()); //This will create By PM selected month totals
+    let byPMSpreadsheetInitializebutton = document.getElementById("byPMSpreadsheet"); //By PM
     byPMSpreadsheetInitializebutton.addEventListener("click", (e: Event) => this.hubFunc(4));
+
+
+
+
+    let johnbutton = document.getElementById("john"); //Gets Johns monthly figures
+    johnbutton.addEventListener("click", (e: Event) => this.hubFunc(8, 1));
+
+    let sambutton = document.getElementById("sam"); //Gets Sams monthly figures
+    sambutton.addEventListener("click", (e: Event) => this.hubFunc(8, 2));
+
+    let christianbutton = document.getElementById("christian"); //Gets Christians monthly figures
+    christianbutton.addEventListener("click", (e: Event) => this.hubFunc(8, 3));
+
+    let robbutton = document.getElementById("rob"); //Gets Robs monthly figures
+    robbutton.addEventListener("click", (e: Event) => this.hubFunc(8, 4));
+    
+    let brianbutton = document.getElementById("brian"); //Gets Brians monthly figures
+    brianbutton.addEventListener("click", (e: Event) => this.hubFunc(8, 5));
+
+    let shaunbutton = document.getElementById("shaun"); //Gets Shauns monthly figures
+    shaunbutton.addEventListener("click", (e: Event) => this.hubFunc(8, 6));
+
+    let mickbutton = document.getElementById("mick"); //Gets Micks monthly figures
+    mickbutton.addEventListener("click", (e: Event) => this.hubFunc(8, 7));
+
+    let adambutton = document.getElementById("adam"); //Gets Micks monthly figures
+    adambutton.addEventListener("click", (e: Event) => this.hubFunc(8, 8));
+
+    let hollybutton = document.getElementById("holly"); //Gets Micks monthly figures
+    hollybutton.addEventListener("click", (e: Event) => this.hubFunc(8, 9));
+
+
+
+
 
     let byPmM1Initializebutton = document.getElementById("byPMM1");//DEPRECATED - NO LONGER USED
     byPmM1Initializebutton.addEventListener("click", (e: Event) => this.byPMM1()); //This will create By PM M1s selected month totals
@@ -110,6 +203,58 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     //sqlTotalInvoiceButton.addEventListener("click", (e: Event) => this.sqlTotalInvoice());
     sqlTotalInvoiceButton.addEventListener("click", (e: Event) => this.hubFunc(2));
 
+    let overrunsButton = document.getElementById("overruns");
+    overrunsButton.addEventListener("click", (e: Event) => this.hubFunc(5));
+
+    let overrunsEfficiencyButton = document.getElementById("overrunsEfficiency");
+    overrunsEfficiencyButton.addEventListener("click", (e: Event) => this.hubFunc(5, 1));
+
+    let overrunsEstimatedvsActualButton = document.getElementById("overrunsEstimatedvsActual");
+    overrunsEstimatedvsActualButton.addEventListener("click", (e: Event) => this.hubFunc(5, 2));
+
+    let productionSitelButton = document.getElementById("productionSite");
+    productionSitelButton.addEventListener("click", (e: Event) => this.hubFunc(6));
+
+    let laserButton = document.getElementById("laser");
+    laserButton.addEventListener("click", (e: Event) => this.hubFunc(6, 1));
+
+    //It's now the Leaves section
+
+
+    let annualLeavesButton = document.getElementById("annualLeaves");
+    annualLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 1));
+
+    let annualLeavesWithoutLoadingButton = document.getElementById("annualLeavesWithoutLoading");
+    annualLeavesWithoutLoadingButton.addEventListener("click", (e: Event) => this.hubFunc(7, 2));
+
+    let bereavementLeavesButton = document.getElementById("bereavementLeaves");
+    bereavementLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 3));
+
+    let tafeLeavesLeavesButton = document.getElementById("tafeLeaves");
+    tafeLeavesLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 4));
+
+    let flexiLeavesButton = document.getElementById("flexiLeaves");
+    flexiLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 5));
+
+    let lwopLeavesButton = document.getElementById("lwopLeaves");
+    lwopLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 6));
+
+    let pubhLeavesButton = document.getElementById("pubhLeaves");
+    pubhLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 7));
+
+    let rosteredLeavesButton = document.getElementById("rosteredLeaves");
+    rosteredLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 8));
+
+    let sickLeavesButton = document.getElementById("sickLeaves");
+    sickLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 9));
+
+    let workcoverLeavesButton = document.getElementById("workcoverLeaves");
+    workcoverLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 10));
+
+    let combinedLeavesLeavesButton = document.getElementById("combinedLeaves");
+    combinedLeavesLeavesButton.addEventListener("click", (e: Event) => this.hubFunc(7, 11));
+    
+
     
     //let hubFuncButton  = document.getElementById("hubFunc");
     //hubFuncButton.addEventListener("click", (e: Event) => this.hubFunc());
@@ -118,9 +263,546 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     
 
   }
+  async currentMonthProductionSites(allData) //Purpose of this one is to get current month data, not all months of year
+  {
+    console.log("currentMonthProductionSites function activated")
+    console.log(allData.properNumberMonth)
+    var rowLength = allData.multiLaserEstimate.length
+    var currMonthArray = new Array();
+
+    allData.multiLaserEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("Laser - Estimate")
+        
+      }
+      
+    });
+    allData.multiLaserActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("Laser - Actual")
+        
+      }
+      
+    });
+    allData.multiSSBANEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("SSBAN - Estimate")
+        
+      }
+      
+    });
+    allData.multiSSBANActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("SSBAN - Actual")
+        
+      }
+      
+    });
+    allData.multiMSBANEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("MSBAN - Estimate")
+        
+      }
+      
+    });
+    allData.multiMSBANActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("MSBAN - Actual")
+        
+      }
+      
+    });
+    allData.multiSSFABEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("SSFAB - Estimate")
+        
+      }
+      
+    });
+    allData.multiSSFABActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("SSFAB - Actual")
+        
+      }
+      
+    });
+    allData.multiMSFABEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("MSFAB - Estimate")
+        
+      }
+      
+    });
+    allData.multiMSFABActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("MSFAB - Actual")
+        
+      }
+      
+    });
+    allData.multiPRESSEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("PRESS - Estimate")
+        
+      }
+      
+    });
+    allData.multiPRESSActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("PRESS - Actual")
+        
+      }
+      
+    });
+    allData.multiFINISHEstimate.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("FINISH - Estimate")
+        
+      }
+      
+    });
+    allData.multiFINISHActual.forEach((element, index) => {
+      if(element[1] == undefined)
+      {
+        return
+      }
+      if(element[1].includes("2022-" + allData.properNumberMonth))
+      {
+        currMonthArray.push(element[0])
+        allData.nameArray.push("FINISH - Actual")
+        
+      }
+      
+    });
+    var newNameArray = allData.nameArray.slice();
+    console.log(currMonthArray)
+    console.log(newNameArray)
+    return {currMonthArray, newNameArray }
+    
+
+  }
+
+  async allProductionSites()
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/sqlFolder/productionsitesSQL.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer, {sheetStubs:true});
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames];
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    var maxRowNumber = range.e.r; //Remember this is max number minus 1 (58-1=57 rows)
+    
+    var nameArray = new Array()
+    
+    var allLaserEstimated = new Array();
+    var allLaserEstimatedDate = new Array();
+    var allLaserActual = new Array();
+    var allLaserActualDate = new Array();
+
+    var multiLaserEstimate = new Array();
+    var multiLaserActual = new Array();
+
+
+    var allSSBanEstimated = new Array();
+    var allSSBanActual = new Array();
+    var allSSBanEstimatedDate = new Array();
+    var allSSBanActualDate = new Array();
+
+    var multiSSBANEstimate = new Array();
+    var multiSSBANActual = new Array();
+
+    var allMSBanEstimated = new Array();
+    var allMSBanActual = new Array();
+    var allMSBanEstimatedDate = new Array();
+    var allMSBanActualDate = new Array();
+
+    var multiMSBANEstimate = new Array();
+    var multiMSBANActual = new Array();
+
+    var allSSFabEstimated = new Array();
+    var allSSFabActual = new Array();
+    var allSSFabEstimatedDate = new Array();
+    var allSSFabActualDate = new Array();
+
+    var multiSSFABEstimate = new Array();
+    var multiSSFABActual = new Array();
+    
+    var allMSFabEstimated = new Array();
+    var allMSFabActual = new Array();
+    var allMSFabEstimatedDate = new Array();
+    var allMSFabActualDate = new Array();
+
+    var multiMSFABEstimate = new Array();
+    var multiMSFABActual = new Array();
+
+    var allPressEstimated = new Array();
+    var allPressActual = new Array();
+    var allPressEstimatedDate = new Array();
+    var allPressActualDate = new Array();
+
+    var multiPRESSEstimate = new Array();
+    var multiPRESSActual = new Array();
+
+    var allFinishEstimated = new Array();
+    var allFinishActual = new Array();
+    var allFinishEstimatedDate = new Array();
+    var allFinishActualDate = new Array();
+
+    var multiFINISHEstimate = new Array();
+    var multiFINISHActual = new Array();
+
+    
+
+    
+    
+    var allElements = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1, {header:'A', raw: false})
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    
+    
+    var char = "Z"
+    var charIncrement = String.fromCharCode(char.charCodeAt(0) + 1);
+    console.log(charIncrement)
+    console.log(sheetObject);
+    console.log(XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1, {header:'A'}))
+    console.log(allElements[0]) //This gets all the elements of row 0 (A:0.29, B:some date, c: etc), console.log(allElements[0]["A"]) gets row 0, element A value
+    allElements.forEach((element, index) => {
+      
+
+      //Rather than having individual arrays for both values and dates, multi-array is used here, that way if meeting certain criteria, its simply to just go to the value part
+      
+      multiLaserEstimate.push([element["A"], element["B"]])
+      multiLaserActual.push([element["C"], element["D"]])
+
+      multiSSBANEstimate.push([element["E"], element["F"]])
+      multiSSBANActual.push([element["G"], element["H"]])
+
+      multiMSBANEstimate.push([element["I"], element["J"]])
+      multiMSBANActual.push([element["K"], element["L"]])
+
+      multiSSFABEstimate.push([element["M"], element["N"]])
+      multiSSFABActual.push([element["O"], element["P"]])
+
+      multiMSFABEstimate.push([element["Q"], element["R"]])
+      multiMSFABActual.push([element["S"], element["T"]])
+
+      multiPRESSEstimate.push([element["U"], element["V"]])
+      multiPRESSActual.push([element["W"], element["X"]])
+
+      multiFINISHEstimate.push([element["Y"], element["Z"]])
+      multiFINISHActual.push([element["AA"], element["AB"]])
+
+      //NOT USING THE BELOW, ONLY THE ABOVE MULTIDIMENSIONAL ARRAYS, THE BELOWS ARE JUST IN CASE
+
+      //console.log(element["A"]) 
+      allLaserEstimated.push(element["A"]);
+      allLaserEstimatedDate.push(element["B"]);
+      //console.log(element);
+
+      allLaserActual.push(element["C"]);
+      allLaserActualDate.push(element["D"]);
+
+      allSSBanEstimated.push(element["E"]);
+      allSSBanEstimatedDate.push(element["F"]);
+
+      allSSBanActual.push(element["G"]);
+      allSSBanActualDate.push(element["H"]);
+
+      allMSBanEstimated.push(element["I"]);
+      allMSBanEstimatedDate.push(element["J"]);
+
+      allMSBanActual.push(element["K"]);
+      allMSBanActualDate.push(element["L"]);
+
+      allSSFabEstimated.push(element["M"]);
+      allSSFabEstimatedDate.push(element["N"]);
+
+      allSSFabActual.push(element["O"]);
+      allSSFabActualDate.push(element["P"]);
+
+      allMSFabEstimated.push(element["Q"]);
+      allMSFabEstimatedDate.push(element["R"]);
+
+      allMSFabActual.push(element["S"]);
+      allMSFabActualDate.push(element["T"]);
+
+      allPressEstimated.push(element["U"]);
+      allPressEstimatedDate.push(element["V"]);
+
+      allPressActual.push(element["W"]);
+      allPressActualDate.push(element["X"]);
+
+      allFinishEstimated.push(element["Y"]);
+      allFinishEstimatedDate.push(element["Z"]);
+
+      allFinishActual.push(element["AA"]);
+      allFinishActualDate.push(element["AB"]);
+
+
+
+
+
+    });
+    // console.log(allLaserEstimated)
+    // console.log(allLaserEstimatedDate)
+    // console.log(allLaserEstimatedDate[0])
+    
+    // console.log(allFinishActual)
+    // console.log(allFinishActualDate)
+    console.log(multiLaserEstimate)
+    console.log(multiFINISHActual)
+    
+
+    var arrayLength = multiLaserEstimate.length 
+
+    const d = new Date();
+    var currentMonth = d.getMonth() + 1; //Gets current month, 0= January, 1= February etc, but I have added 1 to reflect proper number
+    var properNumberMonth;
+    if(currentMonth.toString().length === 1)
+    {
+      properNumberMonth = "0" + currentMonth;
+    }
+    else
+    {
+      properNumberMonth = currentMonth.toString();
+    }
+
+    console.log(properNumberMonth);
+
+    //Plan for this function is to get current month production hours for charts, so I will need to send currMonth and the multidimensional arrays
+    return{ multiLaserEstimate, //This will be returned to hubfunc, will need to send to currentMonthProductionSites()
+    multiLaserActual,
+
+    multiSSBANEstimate,
+    multiSSBANActual,
+
+    multiMSBANEstimate,
+    multiMSBANActual,
+
+    multiSSFABEstimate,
+    multiSSFABActual,
+
+    multiMSFABEstimate,
+    multiMSFABActual,
+
+    multiPRESSEstimate,
+    multiPRESSActual,
+
+    multiFINISHEstimate,
+    multiFINISHActual, properNumberMonth, nameArray }
+
+    
+
+
+
+    /*
+    for(var y = 1; y < 13; y++)
+    {
+      var properNumber;
+      if(y.toString().length === 1)
+      {
+        properNumber = "0" + y;
+      }
+      else
+      {
+        properNumber = y.toString();
+      }
+      for(var x = 1; x < maxRowNumber + 2; x++)
+      {
+        if(sheetObject["O" + x].w.includes("2022"))
+        {
+          console.log(properNumber)
+
+          if(sheetObject["O" + x].w.includes("2022-" + properNumber))
+            {
+              console.log("It has passed")
+              //allDueDates.push(new Date(sheetObject["O" + x].w).toLocaleDateString('default', { month: 'long' }));
+
+              allLaserEstimated.push(sheetObject["A" + x].v);
+              allLaserActual.push(sheetObject["C" + x].v);
+
+              allSSBanEstimated.push(sheetObject["E" + x].v);
+              allSSBanActual.push(sheetObject["G" + x].v);
+
+              allMSBanEstimated.push(sheetObject["I" + x].v);
+              allMSBanActual.push(sheetObject["K" + x].v);
+
+              allSSFabEstimated.push(sheetObject["M" + x].v);
+              allSSFabActual.push(sheetObject["O" + x].v);
+
+              allMSFabEstimated.push(sheetObject["Q" + x].v);
+              allMSFabActual.push(sheetObject["S" + x].v);
+
+              allPressEstimated.push(sheetObject["U" + x].v);
+              allPressActual.push(sheetObject["W" + x].v);
+
+              allFinishEstimated.push(sheetObject["Y" + x].v);
+              allFinishActual.push(sheetObject["AA" + x].v);
+
+              
+
+              
+              break;
+            }
+        }
+      }
+    }
+    console.log(allDueDates)
+    console.log(allLaserEstimated)
+
+    */
+
+
+
+
+
+  }
+
+  async overruns()
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/sqlFolder/overrunSQL.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer, {sheetStubs:true});
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames];
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    var maxRowNumber = range.e.r; //Remember this is max number minus 1 (58-1=57 rows)
+
+    var allDueDatesArray = new Array(); //All the Due Dates -- Column A
+    var allEstimatedArray = new Array(); //All the Estimated Hours -- Column B
+    var allActualArray = new Array(); //All the Actual Hours -- Column C
+    var allEfficiencyArray = new Array(); //All the Efficiency Percentage (percentage difference) -- Column D
+    var allOverrunsArray = new Array(); //All the Overruns Results (Estimated - Actual) -- Column E
+
+    //console.log(sheetObject)
+    
+
+    for(var y = 1; y < 13; y++)
+    {
+      var properNumber;
+      if(y.toString().length === 1)
+      {
+        properNumber = "0" + y;
+      }
+      else
+      {
+        properNumber = y.toString();
+      }
+      for(var x = 1; x < maxRowNumber + 2; x++)
+      {
+        
+        if(sheetObject["A" + x].w.includes("2022"))
+        {
+          
+            
+            console.log(properNumber)
+            
+            if(sheetObject["A" + x].w.includes("2022-" + properNumber))
+            {
+              console.log("It has passed")
+              allDueDatesArray.push(new Date(sheetObject["A" + x].w).toLocaleDateString('default', { month: 'long' }));
+              allEstimatedArray.push(sheetObject["B" + x].v);
+              allActualArray.push(sheetObject["C" + x].v);
+              allEfficiencyArray.push(sheetObject["D" + x].v);
+              allOverrunsArray.push(sheetObject["E" + x].v);
+
+              
+              break;
+            }
+        }
+      }
+    }
+    console.log(allDueDatesArray)
+    console.log(allEstimatedArray)
+    console.log(allActualArray)
+    console.log(allEfficiencyArray)
+    console.log(allOverrunsArray)
+    
+    var chartName = "Overruns"
+    return {allDueDatesArray, allEstimatedArray, allActualArray, allEfficiencyArray, allOverrunsArray, chartName}
+
+  }
+
   async alignThirdArray(selectedFunction, firstLine, secondLine) //This creates a second line that is aligned properly
   {
-    if(selectedFunction === 1) //Bar chart: M1 Per PM, Scatter: Spreadsheet Per PM
+    if(selectedFunction == 1) //Bar chart: M1 Per PM, Scatter: Spreadsheet Per PM
     {
       // X Axis = firstLine.allPersonsArray
       // Y Axis = firstline.allTotalsArray
@@ -129,6 +811,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
       var thirdTotals = new Array();
       console.log(firstLine.allPersonsArray);
       console.log(secondLine.nameArray)
+      
       firstLine.allPersonsArray.forEach((element, index) => 
       {
         switch(element)
@@ -163,8 +846,15 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
             break;
 
           case "HOLLMCMU":
-            console.log("HOLLYMCU");
-            thirdTotals.push(0)
+            secondLine.nameArray.forEach((element2, index2) => 
+            {
+              if(element2 == "Holly")
+              {
+                console.log("HOLLMCMU")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+                
+              }
+            });
             break;
           case "JOHNCOLL":
             secondLine.nameArray.forEach((element2, index2) => 
@@ -177,41 +867,42 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
             });
             break;
 
-        case "MICHNEWB":
-          secondLine.nameArray.forEach((element2, index2) => 
-          {
-            if(element2 == "Mick")
+          case "MICHNEWB":
+            secondLine.nameArray.forEach((element2, index2) => 
             {
-              console.log("MICHNEWB")
-              thirdTotals.push(secondLine.selectedTotals[index2]);
-              
-            }
-          });
-          break;
+              if(element2 == "Mick")
+              {
+                console.log("MICHNEWB")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+                
+              }
+            });
+            break;
 
-        case "ROBCUNN":
-          secondLine.nameArray.forEach((element2, index2) => 
-          {
-            if(element2 == "Rob")
+          case "ROBCUNN":
+            secondLine.nameArray.forEach((element2, index2) => 
             {
-              console.log("Rob")
-              thirdTotals.push(secondLine.selectedTotals[index2]);
-              
-            }
-          });
-          break;
+              if(element2 == "Rob")
+              {
+                console.log("Rob")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+                
+              }
+            });
+            break;
 
-        case "SAMCHU":
-          secondLine.nameArray.forEach((element2, index2) => 
-          {
-            if(element2 == "Sam")
+          case "SAMCHU":
+            secondLine.nameArray.forEach((element2, index2) => 
             {
-              console.log("Sam")
-              thirdTotals.push(secondLine.selectedTotals[index2]);
-              
-            }
-          });
-          break;
+              if(element2 == "Sam")
+              {
+                console.log("Sam")
+                thirdTotals.push(secondLine.selectedTotals[index2]);
+                
+              }
+            });
+            break;
+          
 
           default:
             thirdTotals.push(0);
@@ -270,9 +961,22 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
             }
             break;
 
-          case "HOLLMCMU":
-            console.log("HOLLYMCU");
-            thirdTotals.push(0)
+          case "Holly":
+            var checker = 0;
+            console.log("HOLLMCMU")
+            secondLine.allPersonsArray.forEach((element2, index2) => 
+            {
+              if(element2 == "HOLLMCMU")
+              {
+                console.log("HOLLMCMU")
+                thirdTotals.push(secondLine.allTotalsArray[index2]);
+                checker = 1;
+              }
+            });
+            if(checker == 0)
+            {
+              thirdTotals.push(0);
+            }
             break;
           case "John":
             var checker = 0;
@@ -358,7 +1062,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     }
   }
 
-  async hubFunc(selectedFunction) //Centralized processing so I do not replicate functions constantly
+  async hubFunc(selectedFunction, optionalParameter=null) //Centralized processing so I do not replicate functions constantly
   {
     console.log("This is basically to act as a TRIPWIRE UPLOAD 124")
     var chartHolder
@@ -382,9 +1086,9 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     {
       chartHolder = await this.projectSpreadsheet()
       secondLine = await this.sqlTotalInvoice()
-      this.monthlyChart(chartHolder.monthArray, chartHolder.totalArray, secondLine.allTotalsArray, chartHolder.barName, secondLine.chartName)
+      this.monthlyChart(chartHolder.monthArray, chartHolder.totalArray, secondLine.allTotalsArray, chartHolder.barName, secondLine.chartName, null, null, true, chartHolder.equipmentArraySpreadsheet)
     }
-    else if(selectedFunction === 4)
+    else if(selectedFunction === 4) //Basically the opposite, By PM Spreadsheet and the second line is SQL Per Person
     {
       chartHolder = await this.byPMSpreadsheet()
       secondLine = await this.sqlPerPerson();
@@ -392,10 +1096,430 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
       aligned = await this.alignThirdArray(selectedFunction, chartHolder, secondLine)
       this.monthlyChart(chartHolder.nameArray, chartHolder.selectedTotals, aligned, chartHolder.barName, secondLine.chartName)
     }
-    //console.log(chartHolder.allDatesArray)
+    else if(selectedFunction === 5) //Overruns
+    {
+      if(optionalParameter === null)
+      {
+        chartHolder = await this.overruns()
+        this.monthlyChart(chartHolder.allDueDatesArray, chartHolder.allOverrunsArray, null, chartHolder.chartName)
+      }
+      else if(optionalParameter === 1) //Overruns efficiency
+      {
+        chartHolder = await this.overruns()
+        chartHolder.chartName = "Efficiency"
+        this.monthlyChart(chartHolder.allDueDatesArray, chartHolder.allEfficiencyArray, null, chartHolder.chartName, null)
+      }
+      else if(optionalParameter === 2)//Overruns Estimated vs Actual
+      {
+        targetLine = [6498, 6498, 6498, 6498, 6498, 6498, 6498, 6498, 6498, 6498, 6498, 6498]
+        chartHolder = await this.overruns()
+        chartHolder.chartName = "Actual Hours"
+        var secondBarName = "Estimated Hours"
+        this.estimateActual(chartHolder.allDueDatesArray, chartHolder.allActualArray, chartHolder.allEstimatedArray, chartHolder.chartName, secondBarName, targetLine)
+      }
+      
+      
+    }
+    else if(selectedFunction === 6) //Production Sites
+    {
+      if(optionalParameter === null)
+      {
+        var allProductionSitesObjects
+        allProductionSitesObjects = await this.allProductionSites()
+        console.log(allProductionSitesObjects.multiFINISHEstimate)
+        chartHolder = await this.currentMonthProductionSites(allProductionSitesObjects)
+        const date = new Date();
+        date.setMonth(allProductionSitesObjects.properNumberMonth - 1);
+        var monthName = date.toLocaleString('en-US', {
+          month: 'long',
+        });
+        this.productionSitesChart(chartHolder.newNameArray, chartHolder.currMonthArray, null, monthName)
+
+      }
+      else if(optionalParameter == 1) //Will be adding grouped Laser Estimated and Actual
+      {
+        let allProductionSitesObjects = await this.allProductionSites()
+        
+        var valuesArray = allProductionSitesObjects.multiLaserEstimate.map(d => d[0]) //Gets the first column of Laser Estimate (which are the values)   .map(d => d[0])
+        var datesArray = allProductionSitesObjects.multiLaserEstimate.map(d => d[1]) //Gets the first column of Laser Estimate (which are the dates)    .map(d => d[1])
+
+        console.log(datesArray)
+        console.log(valuesArray)
+        arrangeArray(datesArray, valuesArray) // Need to order the datesArray so it is usable by monthlyChart
+        
+
+        this.monthlyChart(datesArray, valuesArray)
+        
+        
+        
+      }
+      
+    }
+    else if(selectedFunction === 7) //All Leaves (Annual, Annual wo loading, bereavement, college, flexitime, leavewithoutpay, public holiday, rostereddayoff, sickleave, workcover)
+    {
+      var leavesArrays = await this.allLeaves()
+      var weeklyDates = new Array();
+
+      const beginningDate = new Date(2021, 11, 30)
+      weeklyDates = ["30/12/2021", "06/01/2022", "13/01/2022", "20/01/2022", "27/01/2022", "03/02/2022", "10/02/2022", "17/02/2022", "24/02/2022", "03/03/2022", "10/03/2022", "17/03/2022", "24/03/2022", "31/03/2022", "07/04/2022", "14/04/2022", "21/04/2022", "28/04/2022", "05/05/2022", "12/05/2022", "19/05/2022", "26/05/2022", "02/06/2022", "09/06/2022", "16/06/2022", "23/06/2022", "30/06/2022", "07/07/2022", "14/07/2022", "21/07/2022", "28/07/2022", "04/08/2022", "11/08/2022", "18/08/2022", "25/08/2022", "01/09/2022", "08/09/2022", "15/09/2022", "22/09/2022", "29/09/2022", "06/10/2022", "13/10/2022", "20/10/2022", "27/10/2022", "03/11/2022", "10/11/2022", "17/11/2022", "24/11/2022", "01/12/2022", "08/12/2022", "15/12/2022", "22/12/2022", "29/12/2022"]
+
+      console.log(weeklyDates.length)
+      
+
+      if(optionalParameter == 1)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.annualLeave, null,  "Annual Leave Weekly", null, null, null, null, null, null, true)
+      }
+      else if(optionalParameter == 2)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.annualLeaveWithoutLoading, null, "Annual Leave WO Loading Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 3)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.bereavement, null, "Bereavement Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 4)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.college, null, "TAFE Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 5)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.flexitime, null, "Flexitime Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 6)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.leaveWithoutPay, null, "Leave Without Pay Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 7)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.publicholiday, null, "Public Holiday Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 8)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.rosteredDayOff, null, "Rostered Day Off Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 9)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.sickLeave, null, "Sick Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 10)
+      {
+        this.monthlyChart(weeklyDates,leavesArrays.workCover, null, "Work Cover Leave Weekly", null, null, null, null, null, null, true )
+      }
+      else if(optionalParameter == 11)
+      {
+        console.log(leavesArrays.combinedLeave)
+        this.monthlyChart(weeklyDates,leavesArrays.combinedLeave, null, "SL+BEREAV+LWOP Leave Weekly", null, null, null, null, null, null, true)
+      }
+    }
+
+    if(selectedFunction === 8) //Activates a PM Monthly
+    {
+      var PMMonthly = await this.personMonthly()
+      console.log(PMMonthly)
+      var targetLine = [200000, 200000, 200000, 200000, 200000, 200000, 200000, 200000, 200000, 200000, 200000, 200000]
+      if(optionalParameter == 1) //Monthly John Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.john, targetLine, "John", "Target Line", PMMonthly.johnEquipment)
+      }
+      else if(optionalParameter == 2) //Monthly Sam Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.sam, targetLine, "Sam", "Target Line", PMMonthly.samEquipment)
+      } 
+      else if(optionalParameter == 3) //Monthly Christian Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.christian, targetLine, "Christian", "Target Line", PMMonthly.christianEquipment)
+      } 
+      else if(optionalParameter == 4) //Monthly Rob Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.rob, targetLine, "Rob", "Target Line", PMMonthly.robEquipment)
+      } 
+      else if(optionalParameter == 5) //Monthly Brian Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.brian, targetLine, "Brian", "Target Line", PMMonthly.brianEquipment)
+      } 
+      else if(optionalParameter == 6) //Monthly Shaun Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.shaun, targetLine, "Shaun", "Target Line", PMMonthly.shaunEquipment)
+      } 
+      else if(optionalParameter == 7) //Monthly Mick Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.mick, targetLine, "Mick", "Target Line", PMMonthly.mickEquipment)
+      }
+      else if(optionalParameter == 8) //Monthly Adam Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.adam, targetLine, "Adam", "Target Line", PMMonthly.adamEquipment)
+      } 
+      else if(optionalParameter == 9) //Monthly Holly Invoice
+      {
+        this.personMonthlyChart(PMMonthly.allDatesArray, PMMonthly.holly, targetLine, "Holly", "Target Line", PMMonthly.hollyEquipment)
+      }  
+    }
+
     
-    //this.monthlyChart(getSQLTotal.allDatesArray, getSQLTotal.allTotalsArray)
-    //this.monthlyChart((await chartHolder).allPersonsArray, (await chartHolder).allTotalsArray, null, (await chartHolder).chartName)
+  }
+  
+
+
+  async estimateActual(monthArray, totalArray, thirdArray = null, barName = null, lineName = null, fourthArray) //This will create charts for Estimate vs Actual
+  {
+    var newTotalArray = new Array();
+    var TESTER = document.getElementById('tester');
+
+    totalArray.forEach(element => {
+      newTotalArray.push(element?.toLocaleString() || ''); //Nullish coalesing, if the array element is undefined/null, push empty string else do what is intended
+    });
+
+
+    var trace1 = {
+      x: monthArray,
+      y: thirdArray,
+      text: thirdArray,
+      name: lineName,
+      type: 'bar'
+    };
+    var trace2 = {
+      x: monthArray,
+      y: totalArray,
+      text: newTotalArray,
+      name: barName,
+      type: 'bar'
+    };
+    var trace3 = {
+      x: monthArray,
+      y: fourthArray,
+      name: lineName,
+      type: 'line',
+      mode: 'lines',
+      marker: {
+        color: 'red'
+      }
+    };
+    var data2 = [trace1, trace2, trace3];
+
+    Plotly.newPlot( TESTER, data2, { margin: { t: 0 }, legend: {x: 1,y:0.95}, showlegend: true,  },{scrollZoom: true}  );
+  }
+
+  async productionSitesChart(monthArray, totalArray, thirdArray = null, barName = null, lineName = null)
+  {
+    var newTotalArray = new Array();
+    var TESTER = document.getElementById('tester');
+
+    totalArray.forEach(element => {
+      newTotalArray.push(element?.toLocaleString() || ''); //Nullish coalesing, if the array element is undefined/null, push empty string else do what is intended
+    });
+
+    var trace1 = {
+      x: monthArray,
+      name: "Actual",
+      showlegend: true,
+      type: 'bar',
+      visible: 'legendonly',
+      marker: {
+        color: '#ff7f0e'
+      }
+
+    };
+
+    var trace2 = {
+      x: monthArray,
+      y: totalArray,
+      text: newTotalArray,
+      name: "Estimated",
+      type: 'bar',
+      marker: {
+        color: ['#1f77b4', '#ff7f0e', '#1f77b4', '#ff7f0e', '#1f77b4', '#ff7f0e','#1f77b4', '#ff7f0e','#1f77b4', '#ff7f0e','#1f77b4', '#ff7f0e','#1f77b4', '#ff7f0e'],
+        width: 1
+      }
+    };
+    var data2 = [trace1, trace2];
+    
+    Plotly.newPlot( TESTER, data2, { margin: { t: 0 }, legend: {x: 1,y:0.95, }, showlegend: true,  },{scrollZoom: true}  );
+
+  }
+  async personMonthlyChart(monthArray, totalArray, thirdArray = null, barName = null, lineName = null, equipmentTotal=null) //This will create charts for PM Monthly
+  {
+    var newTotalArray = new Array();
+    var TESTER = document.getElementById('tester');
+
+    totalArray.forEach(element => {
+      newTotalArray.push(element?.toLocaleString() || ''); //Nullish coalesing, if the array element is undefined/null, push empty string else do what is intended
+    });
+
+
+    var trace1 = {
+      x: monthArray,
+      y: thirdArray,
+      name: lineName,
+      type: 'line',
+      mode: 'lines',
+      marker: {
+        color: 'red'
+      }
+    };
+    var trace2 = {
+      x: monthArray,
+      y: totalArray,
+      text: newTotalArray,
+      name: barName,
+      type: 'bar'
+    };
+    var trace3 = {
+      x: monthArray,
+      y: equipmentTotal,
+      text: equipmentTotal,
+      name: "Equipment",
+      type: 'bar'
+    };
+    var data2 = [trace1, trace2, trace3];
+
+    Plotly.newPlot( TESTER, data2, { margin: { t: 0 }, legend: {x: 1,y:0.95}, showlegend: true, barmode: 'stack'  },{scrollZoom: true}  );
+  }
+
+
+  async personMonthly() //Gets all arrays for every PM
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/19092022PMSheet.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer, {sheetStubs:true});
+    console.log(workbook.SheetNames)
+    var johnSheetObject = workbook.Sheets[workbook.SheetNames[2]];
+    var samSheetObject = workbook.Sheets[workbook.SheetNames[11]];
+    var christianSheetObject = workbook.Sheets[workbook.SheetNames[3]];
+    var robSheetObject = workbook.Sheets[workbook.SheetNames[4]];
+    var brianSheetObject = workbook.Sheets[workbook.SheetNames[5]];
+    var shaunSheetObject = workbook.Sheets[workbook.SheetNames[12]];
+    var mickSheetObject = workbook.Sheets[workbook.SheetNames[6]];
+
+    var paulSheetObject = workbook.Sheets[workbook.SheetNames[7]];
+    var adamSheetObject = workbook.Sheets[workbook.SheetNames[8]];
+    var hollySheetObject = workbook.Sheets[workbook.SheetNames[9]];
+
+    var john = new Array();
+    var sam = new Array();
+    var christian = new Array();
+    var rob = new Array();
+    var brian = new Array();
+    var shaun = new Array();
+    var mick = new Array();
+
+    var paul = new Array();
+    var adam = new Array();
+    var holly = new Array();
+
+    var johnEquipment = new Array();
+    var samEquipment = new Array();
+    var christianEquipment = new Array();
+    var robEquipment = new Array();
+    var brianEquipment = new Array();
+    var shaunEquipment = new Array();
+    var mickEquipment = new Array();
+
+    var paulEquipment = new Array();
+    var adamEquipment = new Array();
+    var hollyEquipment = new Array();
+
+
+    var allDatesArray = new Array();
+    
+
+
+    for(let x = 0; x < 12; x++) //Pushes column M row 3 value into person Array, allDatesarray gets the month names
+    {
+      john.push(johnSheetObject["M" + (x+3)].v)
+      sam.push(samSheetObject["M" + (x+3)].v)
+      christian.push(christianSheetObject["M" + (x+3)].v)
+      rob.push(robSheetObject["M" + (x+3)].v)
+      brian.push(brianSheetObject["M" + (x+3)].v)
+      shaun.push(shaunSheetObject["M" + (x+3)].v)
+      mick.push(mickSheetObject["M" + (x+3)].v)
+
+      paul.push(paulSheetObject["M" + (x+3)].v)
+      adam.push(adamSheetObject["M" + (x+3)].v)
+      holly.push(hollySheetObject["M" + (x+3)].v)
+
+
+
+      johnEquipment.push(Math.round(johnSheetObject["F" + (x+3)].v))
+      samEquipment.push(Math.round(samSheetObject["F" + (x+3)].v))
+      christianEquipment.push(Math.round(christianSheetObject["F" + (x+3)].v))
+      robEquipment.push(Math.round(robSheetObject["F" + (x+3)].v))
+      brianEquipment.push(Math.round(brianSheetObject["F" + (x+3)].v))
+      shaunEquipment.push(Math.round(shaunSheetObject["F" + (x+3)].v))
+      mickEquipment.push(Math.round(mickSheetObject["F" + (x+3)].v))
+
+      paulEquipment.push(Math.round(paulSheetObject["F" + (x+3)].v))
+      adamEquipment.push(Math.round(adamSheetObject["F" + (x+3)].v))
+      hollyEquipment.push(Math.round(hollySheetObject["F" + (x+3)].v))
+
+
+
+      allDatesArray.push(new Date((x+1).toString()).toLocaleDateString('default', { month: 'long' }));
+    }
+    
+    return {john, sam, christian, rob, brian, shaun, mick, paul, adam, holly, johnEquipment, samEquipment, christianEquipment, robEquipment, brianEquipment, shaunEquipment, mickEquipment, paulEquipment, adamEquipment, hollyEquipment,  allDatesArray}
+       
+  }
+
+
+  async allLeaves()
+  {
+    const sp = spfi().using(SPFx(this.context));
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/sqlFolder/leaves.xlsx").getBuffer();
+    var workbook = XLSX.read(getBuffer, {sheetStubs:true});
+    var sheetNames = workbook.SheetNames[0];
+    var sheetObject = workbook.Sheets[sheetNames];
+    var range = XLSX.utils.decode_range(sheetObject['!ref']);
+    var maxRowNumber = range.e.r; //Remember this is max number minus 1 (53-1=52 rows)
+
+    var annualLeave = new Array();
+    var annualLeaveWithoutLoading = new Array();
+    var bereavement = new Array();
+    var college = new Array();
+    var flexitime = new Array();
+    var leaveWithoutPay = new Array();
+    var publicholiday = new Array();
+    var rosteredDayOff = new Array();
+    var sickLeave = new Array();
+    var workCover = new Array();
+    var payWeeks = new Array();
+    var combinedLeave = new Array();
+    
+    
+
+    var allElements = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1, {header:'A', raw: false})
+    console.log(allElements)
+
+    
+    allElements.forEach(element => {
+
+      annualLeave.push(element['A'])
+      annualLeaveWithoutLoading.push(element['B'])
+      bereavement.push(element['C'])
+      college.push(element['D'])
+      flexitime.push(element['E'])
+      leaveWithoutPay.push(element['F'])
+      publicholiday.push(element['G'])
+      rosteredDayOff.push(element['H'])
+      sickLeave.push(element['I'])
+      workCover.push(element['J'])
+      payWeeks.push(element['K'])
+
+      combinedLeave.push((Math.round(element['C']) + Math.round(element['I']) + Math.round(element['F'])))
+
+      
+      
+    });
+      
+    
+    console.log(annualLeave)
+    console.log(payWeeks)
+
+    return {annualLeave, annualLeaveWithoutLoading, bereavement, college, flexitime, leaveWithoutPay, publicholiday, rosteredDayOff, sickLeave, workCover, payWeeks, combinedLeave }
+
+    
+
+    
   }
 
   async sqlTotalInvoice() //Creates Monthly Total Invoice Array from SQL
@@ -469,7 +1593,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     var allPersonsArray = new Array();
     var allDatesArray = new Array();
 
-    var selectedMonth = "07"
+    var selectedMonth = "08"
 
     for(let x = 1; x < maxRowNumber + 2; x++)
     {
@@ -491,7 +1615,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
 
 
 
-    var chartName = `Per PM Invoiced Selected Month - ${dateName}`
+    var chartName = `Per PM Invoiced - ${dateName}`
     return {allPersonsArray, allTotalsArray, chartName}
     //this.monthlyChart(allPersonsArray, allTotalsArray,)
 
@@ -717,10 +1841,13 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
   async byPMSpreadsheet() //Gets data from PM Spreadsheet and creates Total by Person
   {
     const sp = spfi().using(SPFx(this.context));
-    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    //var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/19092022PMSheet.xlsx").getBuffer();
+    
     var workbook = XLSX.read(getBuffer);
 
     var sheetNames = workbook.SheetNames;
+    console.log(sheetNames)
     var nameArray = new Array();
     sheetNames.forEach(element => 
     {
@@ -747,10 +1874,19 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
         case "Mick":
           nameArray.push(element);
           break;
+        case "Paul":
+          nameArray.push(element);
+          break;
+        case "Adam":
+          nameArray.push(element);
+          break;
+        case "Holly":
+          nameArray.push(element);
+          break;
       }
       
     });
-    //console.log(nameArray);
+    console.log(nameArray);
 
     var sheetObjectArray = new Array();
     nameArray.forEach(element => 
@@ -780,7 +1916,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
       
     });
 
-    var selectedMonth = 6 //Minus 1 for actual month, so for july, 7-1 = 6
+    var selectedMonth = 7 //Minus 1 for actual month, so for july, 7-1 = 6
     var selectedTotals = new Array();
     for(let x = 0; x < nameArray.length; x++)
     {
@@ -798,15 +1934,15 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
       month: 'long',
     });
     //console.log(`Project Managers SpreadSheet Month: ${dateName}`);
-    var barName = `Project Managers SpreadSheet Month: ${dateName}`
+    var barName = `Per PM: ${dateName}`
 
     //this.monthlyChart(nameArray, selectedTotals, null, `Project Managers SpreadSheet Month: ${dateName}`, "M1 Invoice Chosen Month")
     return {nameArray, selectedTotals, barName}
   }
 
 
-
-  async invoicePM() //This will generate a chart based on M1 Invoice Monthly Total of 2022
+  //----------------------------------------------------------------------------------------------------------------------------------
+  async invoicePM() //DEPRECATED, DO NOT USE ----------This will generate a chart based on M1 Invoice Monthly Total of 2022
   {
     //This will be bar chart, not line creation
     const sp = spfi().using(SPFx(this.context));
@@ -850,7 +1986,10 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
   {
     //Will first get the monthly totals chart to begin with
     const sp = spfi().using(SPFx(this.context));
-    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    //var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/reDownloadedPMSpreadsheet.xlsx").getBuffer();
+    //var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/testEndofAugust2022PMMonthlySales.xlsx").getBuffer();
+    var getBuffer = await sp.web.getFileByServerRelativePath("/sites/dirTestsite/Shared Documents/excelTest/19092022PMSheet.xlsx").getBuffer();
+    
     var workbook = XLSX.read(getBuffer);
     var sheetNames = workbook.SheetNames[0];
     var sheetObject = workbook.Sheets[sheetNames]
@@ -864,6 +2003,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     var sheetObjectSpreadsheet = workbookSpreadsheet.Sheets[sheetNamesSpreadsheet]
     var monthArraySpreadsheet = new Array();
     var totalArraySpreadsheet = new Array();
+    var equipmentArraySpreadsheet = new Array();
 
 
 
@@ -877,8 +2017,9 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     for(var x  = row; x < 18; x++)
     {
       monthArray.push(sheetObject["A" + XLSX.utils.encode_row(x)].v);
-      totalArray.push(sheetObject["K" + XLSX.utils.encode_row(x)].v);
-
+      //totalArray.push(sheetObject["K" + XLSX.utils.encode_row(x)].v);
+      totalArray.push(sheetObject["J" + XLSX.utils.encode_row(x)].v);
+      equipmentArraySpreadsheet.push(sheetObject["C" + XLSX.utils.encode_row(x)].v); //This gets the equipment
 
       let date = new Date(sheetObjectSpreadsheet["B" + (x-4)].w);
       monthArraySpreadsheet.push(date.toLocaleDateString('default', {month: 'long'}));// Holds Invoice Monthly months
@@ -887,23 +2028,23 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
 
     //console.log(monthArray);
     //console.log(totalArray); 
-    var barName = "PM Excel Spreadsheet Monthly";
+    var barName = "PM Excel Monthly Excl Veh";
     var lineName = "M1 Invoice Total Monthly";
 
 
 
     //this.monthlyChart(monthArray, totalArray, totalArraySpreadsheet, barName, lineName)
-    return {monthArray, totalArray, barName}
+    return {monthArray, totalArray, barName, equipmentArraySpreadsheet};
   }
 
-  monthlyChart(monthArray, totalArray, thirdArray = null, barName = null, lineName = null) //Creates a chart if given Coords
+  monthlyChart(monthArray, totalArray, thirdArray = null, barName = null, lineName = null, isPercentage = null, isGrouped = null, equipment = null, equipmentArray = null, targetLine = null, hideTrace = null) //Creates a chart if given Coords
   {
     //console.log(thirdArray);
     //console.log(monthArray);
     var newTotalArray = new Array();
 
     totalArray.forEach(element => {
-      newTotalArray.push(element.toLocaleString());
+      newTotalArray.push(element?.toLocaleString() || ''); //Nullish coalesing, if the array element is undefined/null, push empty string else do what is intended
     });
 
     //console.log(newTotalArray);
@@ -917,13 +2058,29 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
     };
     
 
+    if(isGrouped == null)
+    {
+      var trace1 = {
+        x: monthArray,
+        y: thirdArray,
+        name: lineName,
+        type: 'scatter'
+      };
+    }
+    else if (isGrouped == true)
+    {
+      var trace1 = {
+        x: monthArray,
+        y: thirdArray,
+        
+        name: lineName,
+        type: 'bar'
+      };
+    }
 
-    var trace1 = {
-      x: monthArray,
-      y: thirdArray,
-      name: lineName,
-      type: 'scatter'
-    };
+    
+    
+    
     
     var trace2 = {
       x: monthArray,
@@ -932,13 +2089,43 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
       name: barName,
       type: 'bar'
     };
+
+    if(hideTrace == true)
+    {
+      var trace1 = {
+        x: null,
+        y: null,
+        name: null,
+        type: ''
+      };
+    }
+    
+
+    
     
     var data2 = [trace1, trace2];
 
-    Plotly.newPlot( TESTER, data2, { margin: { t: 0 } }, layout ); //data2 not working at the moment, will find out later
+    Plotly.newPlot( TESTER, data2, { margin: { t: 0 }, legend: {x: 1,y:0.95}, showlegend: true,  },{scrollZoom: true}, layout  ); //that margin is basically taking over for layout, layout is rendered useless
+
+    if(equipment == true)
+    {
+      var trace3 = {
+        x: monthArray,
+        y: equipmentArray,
+        text: equipmentArray,
+        name: "Equipment",
+        type: 'bar'
+      };
+      var data3 = [trace1, trace2, trace3]
+      Plotly.newPlot( TESTER, data3, { margin: { t: 0 }, legend: {x: 1,y:0.95}, barmode: 'stack'},{scrollZoom: true}, layout  );
+    }
+    
+
+
+
   }
 
-  async beginExcel()// NO LONGER USED
+  async beginExcel()// NO LONGER USED -----------------------------------------DON'T USE
   {
     console.log("begin the excel import, it has");
     const sp = spfi().using(SPFx(this.context));
@@ -1013,7 +2200,7 @@ export default class SecondDashBoardWebPart extends BaseClientSideWebPart<ISecon
   }
 
 
-  async revealChart() //NO LONGER USED
+  async revealChart() //NO LONGER USED --------------------------------------DON'T USE-----------------------------------------------------------
   {
     var TESTER = document.getElementById('tester');
     Plotly.newPlot( TESTER, [{
